@@ -248,7 +248,7 @@ function buildDiagram(layoutKey, opts){
 function resetDiagram(diagram){
   Object.values(diagram.nodes).forEach(node=>{
     node.mover.style.transform = '';
-    node.mover.classList.remove('lo-active-real','lo-active-dummy','lo-active-fake','lo-fast');
+    node.mover.classList.remove('lo-active-real','lo-active-dummy','lo-active-fake','lo-active-ready','lo-fast');
     node.trail.classList.remove('lo-visible','lo-real','lo-fake');
     node.trail.setAttribute('x2', 0);
     node.trail.setAttribute('y2', 0);
@@ -295,10 +295,18 @@ function playStageOnDiagram(diagram, stage, caption){
   if(liftWho){
     const flId = adjacentLift(layout, stage.mover, 'fl');
     const blId = adjacentLift(layout, stage.mover, 'bl');
-    const ids = liftWho==='both' ? [flId, blId] : liftWho==='fl' ? [flId] : [blId];
-    ids.filter(Boolean).forEach(id=>{
+    const liftIds = liftWho==='both' ? [flId, blId] : liftWho==='fl' ? [flId] : [blId];
+    const activeIds = liftIds.filter(Boolean);
+    activeIds.forEach(id=>{
       const liftNode = diagram.nodes[id];
       if(liftNode) liftNode.mover.classList.add(liftType==='dummy' ? 'lo-active-dummy' : 'lo-active-real');
+    });
+    // the OTHER lifter of this pod (the one that does NOT take the real lift)
+    // still grips in and gets ready — show that too, so the full pod is visible.
+    [flId, blId].filter(Boolean).forEach(id=>{
+      if(activeIds.includes(id)) return;
+      const liftNode = diagram.nodes[id];
+      if(liftNode) liftNode.mover.classList.add('lo-active-ready');
     });
   }
 

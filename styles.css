@@ -220,6 +220,7 @@ h2.section-title:first-child{margin-top:4px;}
 .lo-swatch-jumper{background:var(--gold); box-shadow:0 0 0 2px #ffffff10;}
 .lo-swatch-decoy{background:transparent; border:1.5px dashed var(--muted);}
 .lo-swatch-lift{background:#ffffff30;}
+.lo-swatch-ready{background:transparent; border:1.5px dashed #ffffff70;}
 .lo-swatch-real{background:#3fbf6b;}
 .lo-swatch-dummy{background:var(--red);}
 .lo-swatch-ball{background:var(--chalk); width:9px; height:9px;}
@@ -246,6 +247,7 @@ h2.section-title:first-child{margin-top:4px;}
 .lo-mover{transition:transform .55s cubic-bezier(.2,.8,.2,1);}
 .lo-mover.lo-fast{transition-duration:.4s;}
 
+.lo-role-lift.lo-active-ready{fill:#ffffff1c; stroke:#ffffff60; stroke-dasharray:2 3;}
 .lo-role-lift.lo-active-real{fill:#3fbf6b55; stroke:#3fbf6b; filter:drop-shadow(0 0 6px #3fbf6b88);}
 .lo-role-lift.lo-active-dummy{fill:#c23b2e33; stroke:var(--red); filter:drop-shadow(0 0 6px #c23b2e77); stroke-dasharray:3 3;}
 .lo-role-jumper.lo-active-real{filter:drop-shadow(0 0 10px #e0a82499); stroke-width:4;}
