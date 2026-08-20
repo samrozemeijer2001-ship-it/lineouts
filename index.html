@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Set Piece 26/27 — Lineout</title>
+<meta name="description" content="Interactieve lineout playbook — codes, calls en quiz">
+<meta name="theme-color" content="#15140f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1 class="display">SET PIECE <span>26/27</span></h1>
+    <p>Lineout playbook — tik, leer, stamp erin</p>
+  </div>
+</header>
+
+<nav id="topnav">
+  <button class="navbtn active" data-view="codes"><span class="ic">C</span>Codes</button>
+  <button class="navbtn" data-view="4man"><span class="ic">4</span>4-man</button>
+  <button class="navbtn" data-view="5man"><span class="ic">5</span>5-man</button>
+  <button class="navbtn" data-view="maul"><span class="ic">M</span>Maul</button>
+  <button class="navbtn" data-view="quiz"><span class="ic">Q</span>Quiz</button>
+</nav>
+
+<main>
+
+  <!-- ===================== CODES ===================== -->
+  <section class="view active" id="view-codes">
+    <div class="colgrid">
+    <div>
+    <h2 class="section-title">Veld → aantal man</h2>
+    <div class="panel">
+      <p class="panel-title">Welke lineout gooi je waar</p>
+      <div class="zonebar">
+        <div class="zone-row zone-gold"><span class="tag">GOUD · 22m</span> 5(+1) man &amp; 6+1 man</div>
+        <div class="zone-row zone-green"><span class="tag">GROEN · midden</span> 4 man &amp; 5(+1) man</div>
+        <div class="zone-row zone-red"><span class="tag">ROOD · andere 22m</span> 4 man &amp; 5(+1) man</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Trigger</h2>
+    <div class="panel">
+      <p class="panel-title">Wie start de beweging (positie in de lineout)</p>
+      <div class="triggerscale">
+        <div class="trigger-track"><div class="t-a"></div><div class="t-b"></div></div>
+        <div class="trigger-labels"><span>5</span><span>10</span><span>15</span></div>
+      </div>
+      <div class="trigger-legend">
+        <div class="item tl-a">5–10m<br>voor/achterlifter</div>
+        <div class="item tl-b">10–15m<br>hooker</div>
+      </div>
+      <p class="legend-note">Hangt af van de beweging — verder uitgelegd op training.</p>
+    </div>
+    </div>
+
+    <div>
+    <h2 class="section-title">Cijfers = beweging</h2>
+    <div class="panel">
+      <p class="panel-title">Tik een cijfer</p>
+      <div class="numgrid" id="numgrid"></div>
+    </div>
+
+    <div class="panel">
+      <p class="legend-note"><span class="dot hoofd"></span>witte chip = hoofdcall &nbsp;&nbsp; <span class="dot fake"></span>rode chip = fake / variant<br><br>6-man opstelling is dit seizoen uit gebruik genomen — niet in de quiz.</p>
+    </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ===================== 4 MAN ===================== -->
+  <section class="view" id="view-4man">
+    <h2 class="section-title">4-Man — jumpers A · B</h2>
+    <div class="colgrid">
+    <div class="panel">
+      <p class="panel-title">Middle stack</p>
+      <div class="stripwrap">
+        <div class="strip"><div>voor</div><div class="on">midden</div><div>achter</div></div>
+      </div>
+      <p class="legend-note">Achterlifter start de beweging.</p>
+      <div class="callgrid" data-group="m4-middle"></div>
+      <div class="calldetail" id="detail-m4-middle"></div>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Front stack</p>
+      <div class="stripwrap">
+        <div class="strip"><div class="on">voor</div><div>midden</div><div>achter</div></div>
+      </div>
+      <div class="callgrid" data-group="m4-front"></div>
+      <div class="calldetail" id="detail-m4-front"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ===================== 5 MAN ===================== -->
+  <section class="view" id="view-5man">
+    <h2 class="section-title">5-Man — jumpers A · B · C</h2>
+    <div class="panel">
+      <p class="legend-note">Loop naar binnen, gespreid → zet daarna op <b style="color:var(--chalk)">front</b> of <b style="color:var(--chalk)">middle</b>.</p>
+    </div>
+    <div class="colgrid">
+    <div class="panel">
+      <p class="panel-title">Front stack</p>
+      <div class="stripwrap">
+        <div class="strip"><div class="on">voor</div><div>midden</div><div>achter</div></div>
+      </div>
+      <div class="callgrid" data-group="m5-front"></div>
+      <div class="calldetail" id="detail-m5-front"></div>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Middle stack</p>
+      <div class="stripwrap">
+        <div class="strip"><div>voor</div><div class="on">midden</div><div>achter</div></div>
+      </div>
+      <div class="callgrid" data-group="m5-middle"></div>
+      <div class="calldetail" id="detail-m5-middle"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ===================== MAUL ===================== -->
+  <section class="view" id="view-maul">
+    <h2 class="section-title">Maul → TANK</h2>
+    <div class="panel maulcard">
+      <div class="mono eyebrow">FOCUS</div>
+      <div class="maularrow">↑↑↑</div>
+      <p><b style="color:var(--gold)">Grote punch</b> vanuit de +1 en de nummers ernaast.<br>Blijf in het gevecht — niet loslaten.</p>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="view" id="view-quiz">
+    <h2 class="section-title">Stampen</h2>
+    <div class="panel quizpanel">
+      <div class="scorebar">
+        <div><div class="score" id="quiz-score">0 / 0</div><div class="best" id="quiz-best">beste run: —</div></div>
+      </div>
+      <div class="flashcard" id="flashcard">
+        <div class="code mono" id="fc-code">A1</div>
+        <div class="sub" id="fc-sub">4-man · middle stack</div>
+        <div class="answer" id="fc-answer"></div>
+        <div class="tap-hint" id="fc-hint">tik de kaart voor het antwoord</div>
+      </div>
+      <div class="quizbtns" id="fc-buttons" style="display:none;">
+        <button class="btn-fout" id="btn-fout">✗ fout</button>
+        <button class="btn-goed" id="btn-goed">✓ goed</button>
+      </div>
+      <button class="quiz-reset" id="quiz-reset">score resetten</button>
+    </div>
+  </section>
+
+</main>
+
+<nav id="bottomnav">
+  <button class="navbtn active" data-view="codes"><span class="ic">C</span>Codes</button>
+  <button class="navbtn" data-view="4man"><span class="ic">4</span>4-man</button>
+  <button class="navbtn" data-view="5man"><span class="ic">5</span>5-man</button>
+  <button class="navbtn" data-view="maul"><span class="ic">M</span>Maul</button>
+  <button class="navbtn" data-view="quiz"><span class="ic">Q</span>Quiz</button>
+</nav>
+
+<script src="script.js"></script>
+</body>
+</html>
