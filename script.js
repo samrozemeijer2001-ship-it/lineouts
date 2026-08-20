@@ -242,7 +242,11 @@ function buildDiagram(layoutKey, opts){
   const ball = el('circle', {r:7, cx:HOOKER_X, cy:HOOKER_Y, class:'lo-ball'});
   svg.appendChild(ball);
 
-  return {svg, layout, nodes, ball};
+  // big FAKE/ECHT badge — always visible during a stage, not just in the caption text
+  const badge = el('text', {x:(X0+X1)/2, y:32, 'text-anchor':'middle', class:'lo-badge'});
+  svg.appendChild(badge);
+
+  return {svg, layout, nodes, ball, badge};
 }
 
 function resetDiagram(diagram){
@@ -259,14 +263,30 @@ function resetDiagram(diagram){
   diagram.ball.classList.remove('lo-visible');
   diagram.ball.setAttribute('cx', HOOKER_X);
   diagram.ball.setAttribute('cy', HOOKER_Y);
+  if(diagram.badge){
+    diagram.badge.textContent = '';
+    diagram.badge.setAttribute('class', 'lo-badge');
+  }
 }
 
 function playStageOnDiagram(diagram, stage, caption){
   const layout = diagram.layout;
+
+  // Clear the previous stage's highlight classes first, so fake/echt/ready never
+  // visually "stack" between stages — every stage shows a clean, correct picture.
+  Object.values(diagram.nodes).forEach(node=>{
+    node.mover.classList.remove('lo-active-real','lo-active-dummy','lo-active-fake','lo-active-ready');
+  });
+
   if(caption){
     const text = stage.label || `${stage.fake ? 'FAKE' : 'ECHT'} — ${stage.mover} ${DIGIT_LABEL[stage.digit] || stage.digit}`;
     caption.el.textContent = text;
     caption.el.parentElement.classList.toggle('lo-fake-caption', !!stage.fake);
+  }
+
+  if(diagram.badge){
+    diagram.badge.textContent = stage.fake ? '✗ FAKE' : '✓ ECHT';
+    diagram.badge.setAttribute('class', 'lo-badge ' + (stage.fake ? 'lo-badge-fake' : 'lo-badge-real'));
   }
 
   if(stage.digit === undefined) return;
@@ -288,10 +308,12 @@ function playStageOnDiagram(diagram, stage, caption){
   node.trail.setAttribute('y2', dy);
   node.trail.classList.add('lo-visible', stage.fake ? 'lo-fake' : 'lo-real');
 
-  // lifts — only pod jumpers have dedicated lifters in this model, not lone decoys
+  // lifts — only pod jumpers have dedicated lifters in this model, not lone decoys.
+  // If the jumper's own move is a fake, the lift assisting it is a dummy lift too —
+  // unless the digit itself always implies a dummy lift by design (e.g. digit 5).
   const moverSlot = findSlot(layout, stage.mover);
   const liftWho = moverSlot && moverSlot.role === 'jumper' ? LIFT_FOR_DIGIT[stage.digit] : null;
-  const liftType = (LIFT_TYPE_FOR_DIGIT[stage.digit]) || 'real';
+  const liftType = stage.fake ? 'dummy' : (LIFT_TYPE_FOR_DIGIT[stage.digit] || 'real');
   if(liftWho){
     const flId = adjacentLift(layout, stage.mover, 'fl');
     const blId = adjacentLift(layout, stage.mover, 'bl');
@@ -301,7 +323,7 @@ function playStageOnDiagram(diagram, stage, caption){
       const liftNode = diagram.nodes[id];
       if(liftNode) liftNode.mover.classList.add(liftType==='dummy' ? 'lo-active-dummy' : 'lo-active-real');
     });
-    // the OTHER lifter of this pod (the one that does NOT take the real lift)
+    // the OTHER lifter of this pod (the one that does NOT take this stage's lift)
     // still grips in and gets ready — show that too, so the full pod is visible.
     [flId, blId].filter(Boolean).forEach(id=>{
       if(activeIds.includes(id)) return;
@@ -327,6 +349,10 @@ function playQuickBall(diagram, caption){
   if(caption){
     caption.el.textContent = 'Voorprop draait 180° — bal direct naar hooker, snelle bal naar de 9.';
     caption.el.parentElement.classList.remove('lo-fake-caption');
+  }
+  if(diagram.badge){
+    diagram.badge.textContent = '✓ ECHT';
+    diagram.badge.setAttribute('class', 'lo-badge lo-badge-real');
   }
   const propMover = diagram.svg.querySelector('.lo-mover[data-id="prop"]');
   if(propMover){

@@ -274,6 +274,13 @@ h2.section-title:first-child{margin-top:4px;}
 }
 .lo-caption.lo-fake-caption{border-left-color:var(--red);}
 
+.lo-badge{
+  font-family:'Anton',sans-serif; font-size:20px; letter-spacing:.03em;
+  transition:opacity .15s ease;
+}
+.lo-badge-real{fill:#3fbf6b;}
+.lo-badge-fake{fill:var(--red);}
+
 .lo-controls{display:flex; justify-content:flex-end; margin-top:8px;}
 .lo-replay{
   background:transparent; border:1px solid #ffffff25; color:var(--muted);
