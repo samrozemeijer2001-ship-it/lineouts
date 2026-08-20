@@ -163,14 +163,6 @@ h2.section-title:first-child{margin-top:4px;}
 .numcard:hover{background:#ffffff14;}
 .numcard:active{transform:scale(.94);}
 .numcard.flipped{background:var(--gold); color:#1a1300;}
-.numdetail{
-  grid-column:1/-1;
-  background:#ffffff10; border-radius:10px; padding:12px 14px;
-  font-size:13.5px; line-height:1.5; display:none;
-  border-left:3px solid var(--gold);
-}
-.numdetail.show{display:block;}
-.numdetail b{color:var(--gold);}
 
 /* ---------- TRIGGER SLIDER ---------- */
 .triggerscale{position:relative; margin:14px 0 4px;}
@@ -212,12 +204,94 @@ h2.section-title:first-child{margin-top:4px;}
   color:var(--gold); margin-bottom:6px; font-weight:700;
   text-transform:uppercase; letter-spacing:.06em;
 }
-.calldetail ol{margin:0; padding-left:18px;}
+.calldetail ol{margin:10px 0 0; padding-left:18px;}
 .calldetail li{margin-bottom:3px;}
 .legend-note{font-size:11px; color:var(--muted); margin-top:10px; line-height:1.5;}
 .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px;}
 .dot.hoofd{background:var(--chalk);}
 .dot.fake{background:var(--red);}
+
+/* =========================================================
+   LINEOUT VISUAL / DIAGRAM SYSTEM
+   ========================================================= */
+.lo-legend{display:flex; flex-wrap:wrap; gap:8px 16px;}
+.lo-legend-item{font-size:12px; color:var(--chalk); display:flex; align-items:center; gap:7px;}
+.lo-swatch{width:14px; height:14px; border-radius:50%; display:inline-block; flex:none;}
+.lo-swatch-jumper{background:var(--gold); box-shadow:0 0 0 2px #ffffff10;}
+.lo-swatch-decoy{background:transparent; border:1.5px dashed var(--muted);}
+.lo-swatch-lift{background:#ffffff30;}
+.lo-swatch-real{background:#3fbf6b;}
+.lo-swatch-dummy{background:var(--red);}
+.lo-swatch-ball{background:var(--chalk); width:9px; height:9px;}
+
+.lo-mini-host{margin-top:12px;}
+
+.lo-wrap{margin-top:12px;}
+.lo-svg{width:100%; height:auto; display:block; overflow:visible;}
+.lo-svg.small{max-width:340px; margin:0 auto;}
+
+.lo-track{stroke:#ffffff2a; stroke-width:3; stroke-dasharray:1 8; stroke-linecap:round;}
+.lo-endlabel{font-family:'JetBrains Mono',monospace; font-size:11px; fill:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
+
+.lo-circle{transition:fill .3s ease, stroke .3s ease, filter .3s ease; stroke-width:2.5;}
+.lo-role-lift{fill:#ffffff10; stroke:#ffffff30;}
+.lo-role-jumper{fill:#1a1812; stroke:var(--gold); stroke-width:3;}
+.lo-role-decoy{fill:transparent; stroke:var(--muted); stroke-dasharray:4 3;}
+.lo-role-prop{fill:#ffffff10; stroke:#ffffff30;}
+.lo-label{font-family:'Anton',sans-serif; text-anchor:middle; dominant-baseline:central; pointer-events:none;}
+.lo-label-jumper{fill:var(--gold); font-size:17px;}
+.lo-label-decoy{fill:var(--muted); font-size:15px;}
+.lo-label-tag{font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--chalk); text-anchor:middle;}
+
+.lo-mover{transition:transform .55s cubic-bezier(.2,.8,.2,1);}
+.lo-mover.lo-fast{transition-duration:.4s;}
+
+.lo-role-lift.lo-active-real{fill:#3fbf6b55; stroke:#3fbf6b; filter:drop-shadow(0 0 6px #3fbf6b88);}
+.lo-role-lift.lo-active-dummy{fill:#c23b2e33; stroke:var(--red); filter:drop-shadow(0 0 6px #c23b2e77); stroke-dasharray:3 3;}
+.lo-role-jumper.lo-active-real{filter:drop-shadow(0 0 10px #e0a82499); stroke-width:4;}
+.lo-role-jumper.lo-active-dummy{stroke:var(--red); filter:drop-shadow(0 0 8px #c23b2e88);}
+.lo-role-decoy.lo-active-fake{stroke:var(--red); filter:drop-shadow(0 0 8px #c23b2e77);}
+
+.lo-hooker circle{fill:#ffffff14; stroke:var(--chalk); stroke-width:2;}
+.lo-hooker text{font-family:'JetBrains Mono',monospace; font-size:11px; fill:var(--chalk); text-anchor:middle; dominant-baseline:central;}
+
+.lo-ball{fill:var(--chalk); stroke:#00000040; stroke-width:1; transition:transform .5s cubic-bezier(.25,.6,.3,1); opacity:0;}
+.lo-ball.lo-visible{opacity:1;}
+
+.lo-trail{fill:none; stroke:var(--muted); stroke-width:2; stroke-dasharray:5 5; opacity:0; transition:opacity .2s ease;}
+.lo-trail.lo-visible{opacity:.85;}
+.lo-trail.lo-real{stroke:var(--gold);}
+.lo-trail.lo-fake{stroke:var(--red);}
+
+.lo-caption{
+  margin-top:10px; padding:9px 12px; border-radius:10px;
+  background:#00000030; border-left:3px solid var(--gold);
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  color:var(--chalk); letter-spacing:.02em; min-height:16px;
+  transition:border-color .2s ease;
+}
+.lo-caption.lo-fake-caption{border-left-color:var(--red);}
+
+.lo-controls{display:flex; justify-content:flex-end; margin-top:8px;}
+.lo-replay{
+  background:transparent; border:1px solid #ffffff25; color:var(--muted);
+  font-family:'Inter',sans-serif; font-size:11.5px; font-weight:600;
+  padding:6px 12px; border-radius:8px; cursor:pointer;
+}
+.lo-replay:hover{border-color:var(--gold); color:var(--gold);}
+
+.lo-hidden-overlay{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; padding:26px 14px; text-align:center;
+  background:#ffffff06; border:1px dashed #ffffff20; border-radius:12px;
+}
+.lo-hidden-badge{
+  width:40px; height:40px; border-radius:50%;
+  background:#ffffff10; border:1.5px dashed var(--muted);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Anton',sans-serif; font-size:20px; color:var(--muted);
+}
+.lo-hidden-overlay p{margin:0; font-size:12.5px; color:var(--muted); max-width:220px; line-height:1.5;}
 
 /* ---------- MAUL ---------- */
 .maulcard{text-align:center; padding:22px 16px;}
@@ -243,6 +317,8 @@ h2.section-title:first-child{margin-top:4px;}
 .flashcard .answer{display:none; margin-top:16px; text-align:left; width:100%;}
 .flashcard .answer.show{display:block;}
 .flashcard .answer ol{padding-left:18px; margin:0; font-size:14px; line-height:1.6;}
+.flashcard .answer .lo-wrap{margin-top:4px;}
+.flashcard .answer .lo-caption{text-align:left;}
 .flashcard .tap-hint{font-size:11.5px; color:var(--muted); margin-top:14px;}
 .quizbtns{display:flex; gap:10px; margin-top:14px;}
 .quizbtns button{
@@ -308,4 +384,6 @@ h2.section-title:first-child{margin-top:4px;}
 /* reduced motion */
 @media (prefers-reduced-motion: reduce){
   .view{animation:none;}
+  .lo-mover{transition:none;}
+  .lo-ball{transition:none;}
 }
