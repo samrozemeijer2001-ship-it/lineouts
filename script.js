@@ -2,13 +2,13 @@
    DATA — numbers legend
    ========================================================= */
 const NUMBERS = [
-  {n:'1', text:'Jumper gaat <b>naar voren</b>.'},
-  {n:'2', text:'Jumper springt <b>op de plek</b>.'},
-  {n:'3', text:'Jumper gaat <b>naar achter</b>.'},
-  {n:'4', text:'Jumper springt <b>naar buiten</b> → achterlifter tilt.'},
-  {n:'5', text:'Jumper gaat <b>naar voren</b> → voorlifter doet een <b>dummy til</b>.'},
-  {n:'6', text:'Jumper <b>slipt er recht uit</b> → achterlifter tilt.'},
-  {n:'0', text:'Geen sprong. Voorprop draait <b>180°</b> naar de hooker → snelle bal.'},
+  {n:'1', text:'Jumper gaat <b>naar voren</b>, recht op de gooi af.'},
+  {n:'2', text:'Jumper springt <b>op de plek</b> waar hij al staat.'},
+  {n:'3', text:'Jumper gaat <b>naar achter</b>, weg van zijn beginpositie.'},
+  {n:'4', text:'Jumper springt <b>naar buiten</b> (richting 15m) → de achterlifter tilt hem daar op.'},
+  {n:'5', text:'Jumper gaat <b>naar voren</b> → de voorlifter doet een <b>dummy-til</b>, de jumper vangt zelf lager en sneller.'},
+  {n:'6', text:'Jumper <b>slipt er recht uit</b> op zijn eigen plek → de achterlifter tilt hem op.'},
+  {n:'0', text:'Geen sprong. De voorprop draait <b>180°</b> om naar de hooker → snelle bal naar de 9.'},
 ];
 
 const DIGIT_LABEL = {
@@ -69,6 +69,18 @@ function adjacentLift(layout, jumperId, side){
   const s = layout.slots[i];
   return (s && s.role==='lift') ? s.id : null;
 }
+function roleLabel(layout, slotId){
+  const slot = findSlot(layout, slotId);
+  if(!slot) return '';
+  if(slot.role === 'jumper') return 'springer';
+  if(slot.role === 'decoy') return 'decoy';
+  if(slot.role === 'lift'){
+    if(slotId.indexOf('fl') === 0) return 'voorlifter';
+    if(slotId.indexOf('bl') === 0) return 'achterlifter';
+    return 'lifter';
+  }
+  return '';
+}
 
 /* =========================================================
    DATA — calls per group, with "anim" sequence for the diagram
@@ -78,13 +90,18 @@ const CALLS = {
     label:'4-man · middle stack',
     layout:'m4-middle',
     calls:[
-      {code:'A1', type:'hoofd', who:'Jumper A', steps:['A stapt naar voren, beide lifters tillen.'],
+      {code:'A1', type:'hoofd', who:'Jumper A', steps:[
+        'A stapt naar voren, recht op de gooi af. Beide lifters — voor én achter — tillen hem in dezelfde beweging omhoog zodra hij springt.'],
         anim:{sequence:[{mover:'A', digit:'1'}]}},
-      {code:'A5', type:'fake', who:'Jumper A', steps:['A stapt naar voren, voorlifter faket de til — bal komt toch bij A.'],
+      {code:'A5', type:'fake', who:'Jumper A', steps:[
+        'A stapt naar voren alsof het een A1 wordt. De voorlifter doet alleen een dummy-til — A vangt zelf, net iets lager en sneller, zonder echt getild te worden.'],
         anim:{sequence:[{mover:'A', digit:'5'}]}},
-      {code:'A54', type:'fake', who:'Jumper A · fake→echt', steps:['Fake: A stapt voren, voorlifter faket.', 'Echt: A springt naar buiten, achterlifter tilt echt.'],
+      {code:'A54', type:'fake', who:'Jumper A · fake→echt', steps:[
+        'Fake: A stapt naar voren en de voorlifter doet een dummy-til — precies zoals bij A5. De tegenstander leest dit als de echte bal.',
+        'Echt: vlak daarna springt A juist naar buiten. Nu tilt de achterlifter hem écht omhoog — pas hier komt de bal.'],
         anim:{sequence:[{mover:'A', digit:'5', fake:true},{mover:'A', digit:'4'}]}},
-      {code:'Zero', type:'hoofd', who:'Geen jumper', steps:['Voorprop draait 180° → snelle bal naar hooker.'],
+      {code:'Zero', type:'hoofd', who:'Geen jumper', steps:[
+        'Er wordt niet gesprongen. De voorprop draait in één keer 180° om en speelt de bal direct door aan de hooker, voor een snelle bal naar de 9.'],
         anim:{special:'quick'}},
       {code:'Red', type:'hoofd', who:'Vaste backup', steps:['Vaste backup-worp — details op training'],
         anim:{special:'hidden'}},
@@ -96,11 +113,15 @@ const CALLS = {
     label:'4-man · front stack',
     layout:'m4-front',
     calls:[
-      {code:'A4', type:'hoofd', who:'Jumper A', steps:['A springt naar buiten, achterlifter tilt.'],
+      {code:'A4', type:'hoofd', who:'Jumper A', steps:[
+        'A springt vanuit de voorste positie naar buiten, richting het midden van de rij. De achterlifter tilt hem daar in één keer omhoog voor de vangst.'],
         anim:{sequence:[{mover:'A', digit:'4'}]}},
-      {code:'A45', type:'fake', who:'Jumper A · fake→echt', steps:['Fake: A springt naar buiten (achterlifter beweegt mee).', 'Echt: A stapt naar voren, voorlifter faket — bal komt bij A.'],
+      {code:'A45', type:'fake', who:'Jumper A · fake→echt', steps:[
+        'Fake: A springt eerst naar buiten, als bij A4 — de achterlifter beweegt mee alsof hij gaat tillen.',
+        'Echt: A stapt in plaats daarvan naar voren en de voorlifter doet een dummy-til — de bal komt bij A op de voorste plek terecht.'],
         anim:{sequence:[{mover:'A', digit:'4', fake:true},{mover:'A', digit:'5'}]}},
-      {code:'Zero', type:'hoofd', who:'Geen jumper', steps:['Voorprop draait 180° → snelle bal naar hooker.'],
+      {code:'Zero', type:'hoofd', who:'Geen jumper', steps:[
+        'Er wordt niet gesprongen. De voorprop draait 180° om en speelt de bal direct door aan de hooker, voor een snelle bal naar de 9.'],
         anim:{special:'quick'}},
       {code:'Red', type:'hoofd', who:'Vaste backup', steps:['Vaste backup-worp — details op training'],
         anim:{special:'hidden'}},
@@ -110,11 +131,14 @@ const CALLS = {
     label:'5-man · front stack',
     layout:'m5-front',
     calls:[
-      {code:'C1', type:'fake', who:'Jumper C', steps:['C stapt naar voren, beide lifters tillen.'],
+      {code:'C1', type:'fake', who:'Jumper C', steps:[
+        'C stapt naar voren vanaf de voorste pod, recht op de gooi af. Beide lifters — voor en achter — tillen hem samen omhoog.'],
         anim:{sequence:[{mover:'C', digit:'1'}]}},
-      {code:'C5', type:'fake', who:'Jumper C', steps:['C stapt naar voren, voorlifter faket de til — bal komt toch bij C.'],
+      {code:'C5', type:'fake', who:'Jumper C', steps:[
+        'C stapt naar voren zoals bij C1, maar de voorlifter faket de til — C vangt de bal net iets lager en sneller op eigen kracht.'],
         anim:{sequence:[{mover:'C', digit:'5'}]}},
-      {code:'CLoop', type:'fake', who:'Jumper C · loop', steps:['C loopt weg van zijn eigen plek en vangt daar — details op training'],
+      {code:'CLoop', type:'fake', who:'Jumper C · loop', steps:[
+        'C loopt weg van zijn eigen plek in de rij en vangt de bal verderop, zonder dat een vaste lifter hem optilt — puur op snelheid en verrassing.'],
         anim:{sequence:[{mover:'C', digit:'loop'}]}},
       {code:'Red', type:'hoofd', who:'Vaste backup', steps:['Vaste backup-worp — details op training'],
         anim:{special:'hidden'}},
@@ -124,13 +148,19 @@ const CALLS = {
     label:'5-man · middle stack',
     layout:'m5-middle',
     calls:[
-      {code:'A1', type:'hoofd', who:'Jumper A', steps:['A stapt naar voren, beide lifters tillen.'],
+      {code:'A1', type:'hoofd', who:'Jumper A', steps:[
+        'A stapt naar voren vanuit het midden van de rij. Beide lifters — voor en achter — tillen hem in dezelfde beweging omhoog.'],
         anim:{sequence:[{mover:'A', digit:'1'}]}},
-      {code:'A4', type:'fake', who:'Jumper A', steps:['A springt naar buiten, achterlifter tilt.'],
+      {code:'A4', type:'fake', who:'Jumper A', steps:[
+        'A springt naar buiten, richting de 15m-lijn. De achterlifter tilt hem daar op voor de vangst.'],
         anim:{sequence:[{mover:'A', digit:'4'}]}},
-      {code:'BSlip4', type:'fake', who:'Jumper B · slip', steps:['Fake: B slipt er recht uit op zijn eigen plek (6-stijl).', 'Echt: A springt naar buiten, achterlifter tilt écht.'],
+      {code:'BSlip4', type:'fake', who:'Jumper B · slip', steps:[
+        'Fake: B — een decoy verderop in de rij — slipt er recht uit alsof hij zelf springt. Dat moet de tegenstander wegtrekken van de echte actie.',
+        'Echt: terwijl de tegenstander op B let, springt A naar buiten en tilt de achterlifter hem écht omhoog voor de vangst.'],
         anim:{sequence:[{mover:'B', digit:'6', fake:true},{mover:'A', digit:'4'}]}},
-      {code:'BSlipC', type:'fake', who:'B fake → C echt', steps:['Fake: B slipt er recht uit op zijn eigen plek (6-stijl).', 'Echt: bal gaat naar jumper C, die op zijn plek vangt.'],
+      {code:'BSlipC', type:'fake', who:'B fake → C echt', steps:[
+        'Fake: B slipt er recht uit op zijn eigen plek, net als bij BSlip4 — puur om aandacht weg te trekken van de echte bal.',
+        'Echt: de bal gaat naar jumper C, die op zijn eigen plek in de rij vangt zonder dat er specifiek voor hem getild wordt.'],
         anim:{sequence:[{mover:'B', digit:'6', fake:true},{mover:'C', digit:'2'}]}},
       {code:'Red', type:'hoofd', who:'Vaste backup', steps:['Vaste backup-worp — details op training'],
         anim:{special:'hidden'}},
@@ -139,19 +169,26 @@ const CALLS = {
 };
 
 /* =========================================================
-   LINEOUT VISUALIZER — builds & animates the SVG diagram
+   LINEOUT VISUALIZER — builds one clear, static diagram per step
    ========================================================= */
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const VB_W = 640, VB_H = 220, TRACK_Y = 140;
-const X0 = 150, X1 = 580;
-const HOOKER_X = 40, HOOKER_Y = 178;
-const PROP_X = 108;
-const SCRUMHALF_X = 615, SCRUMHALF_Y = 190;
+const VB_W = 780, VB_H = 285, TRACK_Y = 140;
+const X0 = 210, X1 = 700;
+const HOOKER_X = 60, HOOKER_Y = 200;
+const PROP_X = 150;
+const SCRUMHALF_X = 730, SCRUMHALF_Y = 220;
+const ROLECAP_Y = TRACK_Y + 68;
+const FIELDLABEL_Y = TRACK_Y + 96;
 
 function el(tag, attrs){
   const e = document.createElementNS(SVG_NS, tag);
   for(const k in attrs) e.setAttribute(k, attrs[k]);
   return e;
+}
+function txt(tag_attrs, content){
+  const t = el('text', tag_attrs);
+  t.textContent = content;
+  return t;
 }
 
 function slotX(i, n){
@@ -160,274 +197,196 @@ function slotX(i, n){
 }
 
 const DELTA = {
-  '1':  {dx:-45, dy:-55},
-  '2':  {dx:0,   dy:-55},
-  '3':  {dx:45,  dy:-55},
-  '4':  {dx:-15, dy:-85},
-  '5':  {dx:-45, dy:-55, dyFake:-20},
-  '6':  {dx:15,  dy:-85, dyFake:-20},
-  'loop':{dx:92, dy:-55},
+  '1':  {dx:-60, dy:-70},
+  '2':  {dx:0,   dy:-70},
+  '3':  {dx:60,  dy:-70},
+  '4':  {dx:-20, dy:-100},
+  '5':  {dx:-60, dy:-70, dyFake:-28},
+  '6':  {dx:20,  dy:-100, dyFake:-28},
+  'loop':{dx:120, dy:-70},
 };
 const LIFT_FOR_DIGIT = {
   '1':'both', '2':'both', '3':'both', '4':'bl', '5':'fl', '6':'bl', 'loop':null,
 };
 const LIFT_TYPE_FOR_DIGIT = { '5':'dummy' };
 
-function buildDiagram(layoutKey, opts){
+function makeBall(x,y){
+  return el('circle', {cx:x, cy:y, r:9, class:'lo-ball lo-visible'});
+}
+
+/**
+ * Builds one static SVG snapshot of the formation for a single step.
+ * step: {moverId, digit, fake} OR {quick:true} for the Zero-call.
+ */
+function buildStepSVG(layoutKey, step, opts){
   opts = opts || {};
   const layout = LAYOUTS[layoutKey];
   const n = layout.slots.length;
   const svg = el('svg', {viewBox:`0 0 ${VB_W} ${VB_H}`, class:'lo-svg'+(opts.small?' small':''), 'aria-hidden':'true'});
 
-  const defs = el('defs', {});
-  const marker = el('marker', {id:'lo-arrow-'+Math.random().toString(36).slice(2), markerWidth:'8', markerHeight:'8', refX:'6', refY:'4', orient:'auto'});
-  const arrowPath = el('path', {d:'M0,0 L8,4 L0,8 Z', fill:'currentColor'});
-  marker.appendChild(arrowPath);
-  defs.appendChild(marker);
-  svg.appendChild(defs);
-  const arrowId = marker.getAttribute('id');
-
-  // track line
   svg.appendChild(el('line', {x1:PROP_X, y1:TRACK_Y, x2:X1, y2:TRACK_Y, class:'lo-track'}));
-  svg.appendChild(el('text', {x:PROP_X-6, y:TRACK_Y+42, class:'lo-endlabel', 'text-anchor':'start'})).textContent = 'touch';
-  svg.appendChild(el('text', {x:X1, y:TRACK_Y+42, class:'lo-endlabel', 'text-anchor':'end'})).textContent = '15m';
+  svg.appendChild(txt({x:PROP_X-10, y:FIELDLABEL_Y, class:'lo-endlabel', 'text-anchor':'start'}, 'TOUCH'));
+  svg.appendChild(txt({x:X1, y:FIELDLABEL_Y, class:'lo-endlabel', 'text-anchor':'end'}, '15M'));
 
   // hooker
-  const hookerG = el('g', {class:'lo-hooker'});
-  hookerG.appendChild(el('circle', {cx:HOOKER_X, cy:HOOKER_Y, r:15}));
-  const hookerTxt = el('text', {x:HOOKER_X, y:HOOKER_Y});
-  hookerTxt.textContent = 'H';
-  hookerG.appendChild(hookerTxt);
+  const hookerG = el('g', {class:'lo-figure lo-figure-support', transform:`translate(${HOOKER_X},${HOOKER_Y})`});
+  hookerG.appendChild(el('circle', {r:18, class:'lo-circ lo-role-support'}));
+  hookerG.appendChild(txt({class:'lo-idtxt', y:2}, 'H'));
   svg.appendChild(hookerG);
+  svg.appendChild(txt({x:HOOKER_X, y:HOOKER_Y+38, class:'lo-rolecap', 'text-anchor':'middle'}, 'hooker'));
 
-  // prop (always present, near touchline end of the line)
-  const propOuter = el('g', {transform:`translate(${PROP_X},${TRACK_Y})`});
-  const propMover = el('g', {class:'lo-mover', 'data-id':'prop'});
-  propMover.appendChild(el('circle', {r:12, class:'lo-circle lo-role-prop', cx:0, cy:0}));
-  const propTxt = el('text', {x:0, y:1, class:'lo-label lo-label-decoy'});
-  propTxt.textContent = 'P';
-  propMover.appendChild(propTxt);
-  propOuter.appendChild(propMover);
-  svg.appendChild(propOuter);
+  // prop — rotates 180° for the quick-ball call
+  const propRot = step.quick ? 180 : 0;
+  const propG = el('g', {class:'lo-figure lo-figure-support'+(step.quick?' lo-figure-real':''), transform:`translate(${PROP_X},${TRACK_Y}) rotate(${propRot})`});
+  propG.appendChild(el('circle', {r:16, class:'lo-circ lo-role-support'}));
+  propG.appendChild(txt({class:'lo-idtxt', y:2}, 'P'));
+  svg.appendChild(propG);
+  svg.appendChild(txt({x:PROP_X, y:ROLECAP_Y, class:'lo-rolecap', 'text-anchor':'middle'}, 'prop'));
 
-  // scrumhalf (only relevant for quick ball, drawn faint always)
-  const shG = el('g', {class:'lo-hooker', style:'opacity:.55'});
-  shG.appendChild(el('circle', {cx:SCRUMHALF_X, cy:SCRUMHALF_Y, r:12}));
-  const shTxt = el('text', {x:SCRUMHALF_X, y:SCRUMHALF_Y});
-  shTxt.textContent = '9';
-  shG.appendChild(shTxt);
+  // scrumhalf — only "lit up" on the quick-ball call
+  const shOpacity = step.quick ? '1' : '.45';
+  const shG = el('g', {class:'lo-figure lo-figure-support'+(step.quick?' lo-figure-real':''), style:`opacity:${shOpacity}`, transform:`translate(${SCRUMHALF_X},${SCRUMHALF_Y})`});
+  shG.appendChild(el('circle', {r:15, class:'lo-circ lo-role-support'}));
+  shG.appendChild(txt({class:'lo-idtxt', y:2}, '9'));
   svg.appendChild(shG);
+  svg.appendChild(txt({x:SCRUMHALF_X, y:SCRUMHALF_Y+34, class:'lo-rolecap', 'text-anchor':'middle'}, 'scrumhalf'));
 
-  const nodes = {}; // id -> {outer, mover, circle, trail}
-  layout.slots.forEach((slot,i)=>{
-    const x = slotX(i,n);
-    const outer = el('g', {transform:`translate(${x},${TRACK_Y})`});
-    const trail = el('line', {x1:0, y1:0, x2:0, y2:0, class:'lo-trail', 'marker-end':`url(#${arrowId})`, style:'color:var(--gold)'});
-    outer.appendChild(trail);
-    const mover = el('g', {class:'lo-mover', 'data-id':slot.id});
-    const r = slot.role==='jumper' ? 20 : slot.role==='decoy' ? 18 : 14;
-    const circle = el('circle', {r:r, cx:0, cy:0, class:'lo-circle lo-role-'+slot.role});
-    mover.appendChild(circle);
-    if(slot.role!=='lift'){
-      const label = el('text', {x:0, y:1, class:'lo-label '+(slot.role==='jumper'?'lo-label-jumper':'lo-label-decoy')});
-      label.textContent = slot.id.replace(/_.*/,'').toUpperCase();
-      mover.appendChild(label);
-    }
-    outer.appendChild(mover);
-    svg.appendChild(outer);
-    nodes[slot.id] = {outer, mover, circle, trail};
-  });
-
-  // ball
-  const ball = el('circle', {r:7, cx:HOOKER_X, cy:HOOKER_Y, class:'lo-ball'});
-  svg.appendChild(ball);
-
-  // big FAKE/ECHT badge — always visible during a stage, not just in the caption text
-  const badge = el('text', {x:(X0+X1)/2, y:32, 'text-anchor':'middle', class:'lo-badge'});
-  svg.appendChild(badge);
-
-  return {svg, layout, nodes, ball, badge};
-}
-
-function resetDiagram(diagram){
-  Object.values(diagram.nodes).forEach(node=>{
-    node.mover.style.transform = '';
-    node.mover.classList.remove('lo-active-real','lo-active-dummy','lo-active-fake','lo-active-ready','lo-fast');
-    node.trail.classList.remove('lo-visible','lo-real','lo-fake');
-    node.trail.setAttribute('x2', 0);
-    node.trail.setAttribute('y2', 0);
-  });
-  const propMover = diagram.svg.querySelector('.lo-mover[data-id="prop"]');
-  if(propMover) propMover.style.transform = '';
-  diagram.ball.style.transform = '';
-  diagram.ball.classList.remove('lo-visible');
-  diagram.ball.setAttribute('cx', HOOKER_X);
-  diagram.ball.setAttribute('cy', HOOKER_Y);
-  if(diagram.badge){
-    diagram.badge.textContent = '';
-    diagram.badge.setAttribute('class', 'lo-badge');
-  }
-}
-
-function playStageOnDiagram(diagram, stage, caption){
-  const layout = diagram.layout;
-
-  // Clear the previous stage's highlight classes first, so fake/echt/ready never
-  // visually "stack" between stages — every stage shows a clean, correct picture.
-  Object.values(diagram.nodes).forEach(node=>{
-    node.mover.classList.remove('lo-active-real','lo-active-dummy','lo-active-fake','lo-active-ready');
-  });
-
-  if(caption){
-    const text = stage.label || `${stage.fake ? 'FAKE' : 'ECHT'} — ${stage.mover} ${DIGIT_LABEL[stage.digit] || stage.digit}`;
-    caption.el.textContent = text;
-    caption.el.parentElement.classList.toggle('lo-fake-caption', !!stage.fake);
+  if(step.quick){
+    svg.appendChild(makeBall(SCRUMHALF_X, SCRUMHALF_Y));
+    return svg;
   }
 
-  if(diagram.badge){
-    diagram.badge.textContent = stage.fake ? '✗ FAKE' : '✓ ECHT';
-    diagram.badge.setAttribute('class', 'lo-badge ' + (stage.fake ? 'lo-badge-fake' : 'lo-badge-real'));
-  }
-
-  if(stage.digit === undefined) return;
-
-  const delta = DELTA[stage.digit] || {dx:0,dy:0};
-  const dy = stage.fake && delta.dyFake!==undefined ? delta.dyFake : delta.dy;
+  // ---- jumpers / lifters / decoys ----
+  const moverIdx = layout.slots.findIndex(s=>s.id===step.moverId);
+  const moverSlot = layout.slots[moverIdx];
+  const delta = DELTA[step.digit] || {dx:0,dy:0};
+  const dy = (step.fake && delta.dyFake!==undefined) ? delta.dyFake : delta.dy;
   const dx = delta.dx;
-  const node = diagram.nodes[stage.mover];
-  if(!node) return;
+  const moverX = slotX(moverIdx, n) + dx;
+  const moverY = TRACK_Y + dy;
 
-  node.mover.classList.toggle('lo-fast', !!stage.fast);
-  node.mover.style.transform = `translate(${dx}px, ${dy}px)`;
-  node.mover.classList.add(stage.fake ? 'lo-active-dummy' : 'lo-active-real');
-  if(node.circle.classList.contains('lo-role-decoy') && stage.fake){
-    node.mover.classList.add('lo-active-fake');
-  }
-
-  node.trail.setAttribute('x2', dx);
-  node.trail.setAttribute('y2', dy);
-  node.trail.classList.add('lo-visible', stage.fake ? 'lo-fake' : 'lo-real');
-
-  // lifts — only pod jumpers have dedicated lifters in this model, not lone decoys.
-  // If the jumper's own move is a fake, the lift assisting it is a dummy lift too —
-  // unless the digit itself always implies a dummy lift by design (e.g. digit 5).
-  const moverSlot = findSlot(layout, stage.mover);
-  const liftWho = moverSlot && moverSlot.role === 'jumper' ? LIFT_FOR_DIGIT[stage.digit] : null;
-  const liftType = stage.fake ? 'dummy' : (LIFT_TYPE_FOR_DIGIT[stage.digit] || 'real');
+  const liftWho = (moverSlot && moverSlot.role === 'jumper') ? LIFT_FOR_DIGIT[step.digit] : null;
+  const liftType = step.fake ? 'dummy' : (LIFT_TYPE_FOR_DIGIT[step.digit] || 'real');
+  let flId = null, blId = null, activeLiftIds = [];
   if(liftWho){
-    const flId = adjacentLift(layout, stage.mover, 'fl');
-    const blId = adjacentLift(layout, stage.mover, 'bl');
-    const liftIds = liftWho==='both' ? [flId, blId] : liftWho==='fl' ? [flId] : [blId];
-    const activeIds = liftIds.filter(Boolean);
-    activeIds.forEach(id=>{
-      const liftNode = diagram.nodes[id];
-      if(liftNode) liftNode.mover.classList.add(liftType==='dummy' ? 'lo-active-dummy' : 'lo-active-real');
-    });
-    // the OTHER lifter of this pod (the one that does NOT take this stage's lift)
-    // still grips in and gets ready — show that too, so the full pod is visible.
-    [flId, blId].filter(Boolean).forEach(id=>{
-      if(activeIds.includes(id)) return;
-      const liftNode = diagram.nodes[id];
-      if(liftNode) liftNode.mover.classList.add('lo-active-ready');
-    });
+    flId = adjacentLift(layout, step.moverId, 'fl');
+    blId = adjacentLift(layout, step.moverId, 'bl');
+    activeLiftIds = (liftWho==='both' ? [flId, blId] : liftWho==='fl' ? [flId] : [blId]).filter(Boolean);
+  }
+  const readyLiftIds = [flId, blId].filter(id => id && !activeLiftIds.includes(id));
+
+  const positions = {};
+  layout.slots.forEach((slot,i)=>{
+    let x = slotX(i,n), y = TRACK_Y;
+    if(slot.id === step.moverId){ x = moverX; y = moverY; }
+    else if(activeLiftIds.includes(slot.id)){ y = TRACK_Y - 26; }
+    else if(readyLiftIds.includes(slot.id)){ y = TRACK_Y - 10; }
+    positions[slot.id] = {x,y};
+  });
+
+  // connecting lines between lifter(s) and the jumper — drawn first, figures sit on top
+  [...activeLiftIds, ...readyLiftIds].forEach(id=>{
+    const p = positions[id];
+    const cls = activeLiftIds.includes(id) ? (liftType==='dummy' ? 'lo-link-fake' : 'lo-link-real') : 'lo-link-ready';
+    svg.appendChild(el('line', {x1:p.x, y1:p.y, x2:moverX, y2:moverY, class:'lo-link '+cls}));
+  });
+
+  layout.slots.forEach(slot=>{
+    const p = positions[slot.id];
+    let statusClass = '';
+    if(slot.id === step.moverId) statusClass = step.fake ? 'lo-figure-fake' : 'lo-figure-real';
+    else if(activeLiftIds.includes(slot.id)) statusClass = liftType==='dummy' ? 'lo-figure-fake' : 'lo-figure-real';
+    else if(readyLiftIds.includes(slot.id)) statusClass = 'lo-figure-ready';
+    else if(slot.role==='decoy') statusClass = 'lo-figure-idle';
+
+    const r = slot.role==='jumper' ? 27 : slot.role==='decoy' ? 24 : 20;
+    const g = el('g', {class:'lo-figure '+statusClass, transform:`translate(${p.x},${p.y})`});
+    g.appendChild(el('circle', {r:r, class:'lo-circ lo-role-'+slot.role}));
+    g.appendChild(txt({class:'lo-idtxt', y:2}, slot.id.replace(/_.*/,'').toUpperCase()));
+    svg.appendChild(g);
+
+    svg.appendChild(txt({x:slotX(layout.slots.indexOf(slot), n), y:ROLECAP_Y, class:'lo-rolecap', 'text-anchor':'middle'}, roleLabel(layout, slot.id)));
+  });
+
+  if(!step.fake){
+    svg.appendChild(makeBall(moverX, moverY - 36));
   }
 
-  // ball travel — only on real (non-fake) stages
-  if(!stage.fake){
-    const idx = layout.slots.findIndex(s=>s.id===stage.mover);
-    const x = slotX(idx, layout.slots.length);
-    const targetX = x + dx;
-    const targetY = TRACK_Y + dy;
-    const bdx = targetX - HOOKER_X;
-    const bdy = targetY - HOOKER_Y;
-    diagram.ball.classList.add('lo-visible');
-    diagram.ball.style.transform = `translate(${bdx}px, ${bdy}px)`;
-  }
+  return svg;
 }
 
-function playQuickBall(diagram, caption){
-  if(caption){
-    caption.el.textContent = 'Voorprop draait 180° — bal direct naar hooker, snelle bal naar de 9.';
-    caption.el.parentElement.classList.remove('lo-fake-caption');
-  }
-  if(diagram.badge){
-    diagram.badge.textContent = '✓ ECHT';
-    diagram.badge.setAttribute('class', 'lo-badge lo-badge-real');
-  }
-  const propMover = diagram.svg.querySelector('.lo-mover[data-id="prop"]');
-  if(propMover){
-    propMover.style.transformOrigin = 'center';
-    propMover.style.transform = 'rotate(180deg)';
-    propMover.classList.add('lo-active-real');
-  }
-  diagram.ball.classList.add('lo-visible');
-  diagram.ball.style.transform = `translate(${SCRUMHALF_X-HOOKER_X}px, ${SCRUMHALF_Y-HOOKER_Y}px)`;
-}
-
-function showHidden(host, call){
-  host.innerHTML = '';
-  const overlay = document.createElement('div');
-  overlay.className = 'lo-hidden-overlay';
-  overlay.innerHTML = `<div class="lo-hidden-badge">?</div><p>${call.code} is een vaste variant — de precieze uitvoering wordt op training getoond.</p>`;
-  host.appendChild(overlay);
+function hiddenBlock(call){
+  const div = document.createElement('div');
+  div.className = 'stepcard stepcard-hidden';
+  div.innerHTML = `<div class="stepcard-head"><span class="step-eyebrow">VASTE VARIANT</span></div>
+    <div class="hidden-block"><div class="hidden-mark">?</div><p><b>${call.code}</b> wordt in detail op training getoond.</p></div>`;
+  return div;
 }
 
 /**
- * Renders and plays a call's animation inside `host` (an element).
- * Adds a caption line and a replay button.
+ * Renders a call as a stack of big, static "step cards" — one per stage of
+ * the call, each with its own diagram, a bold FAKE/ECHT tag and the full
+ * explanation text. No animation timing, so it can be studied at your own pace.
  */
-function renderCallVisual(host, layoutKey, call, opts){
+function renderCallSteps(host, layoutKey, call, opts){
   opts = opts || {};
   host.innerHTML = '';
 
   if(call.anim && call.anim.special === 'hidden'){
-    showHidden(host, call);
+    host.appendChild(hiddenBlock(call));
     return;
   }
 
-  const wrap = document.createElement('div');
-  wrap.className = 'lo-wrap';
-  host.appendChild(wrap);
-
-  const diagram = buildDiagram(layoutKey, {small:opts.small});
-  wrap.appendChild(diagram.svg);
-
-  const captionBox = document.createElement('div');
-  captionBox.className = 'lo-caption';
-  const captionEl = document.createElement('span');
-  captionBox.appendChild(captionEl);
-  wrap.appendChild(captionBox);
-  const caption = {el: captionEl};
-
-  if(!opts.noControls){
-    const controls = document.createElement('div');
-    controls.className = 'lo-controls';
-    const btn = document.createElement('button');
-    btn.className = 'lo-replay';
-    btn.textContent = '↻ speel opnieuw';
-    btn.addEventListener('click', ()=> run());
-    controls.appendChild(btn);
-    wrap.appendChild(controls);
+  let steps;
+  if(call.anim && call.anim.special === 'quick'){
+    steps = [{quick:true, fake:false}];
+  } else {
+    steps = ((call.anim && call.anim.sequence) || []).map(s=>({moverId:s.mover, digit:s.digit, fake:!!s.fake}));
   }
+  const total = steps.length;
 
-  function run(){
-    resetDiagram(diagram);
-    if(call.anim && call.anim.special === 'quick'){
-      // slight delay so the reset is visible before the rotate
-      setTimeout(()=> playQuickBall(diagram, caption), 120);
-      return;
+  steps.forEach((step, i)=>{
+    const svg = buildStepSVG(layoutKey, step, {small:opts.small});
+
+    const card = document.createElement('div');
+    card.className = 'stepcard ' + (step.fake ? 'stepcard-fake' : 'stepcard-real');
+
+    const head = document.createElement('div');
+    head.className = 'stepcard-head';
+    const eyebrow = document.createElement('span');
+    eyebrow.className = 'step-eyebrow';
+    eyebrow.textContent = total>1 ? `STAP ${i+1} VAN ${total}` : 'WAT GEBEURT ER';
+    const pill = document.createElement('span');
+    pill.className = 'step-pill ' + (step.fake ? 'pill-fake' : 'pill-real');
+    pill.textContent = step.fake ? '✗ FAKE' : '✓ ECHT';
+    head.appendChild(eyebrow);
+    head.appendChild(pill);
+    card.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'stepcard-body';
+    const diagramWrap = document.createElement('div');
+    diagramWrap.className = 'stepcard-diagram';
+    diagramWrap.appendChild(svg);
+    body.appendChild(diagramWrap);
+
+    const textWrap = document.createElement('div');
+    textWrap.className = 'stepcard-text';
+    const p = document.createElement('p');
+    p.innerHTML = (call.steps && call.steps[i]) || '';
+    textWrap.appendChild(p);
+    body.appendChild(textWrap);
+
+    card.appendChild(body);
+    host.appendChild(card);
+
+    if(i < total-1){
+      const conn = document.createElement('div');
+      conn.className = 'stepconnector';
+      conn.textContent = 'DAN';
+      host.appendChild(conn);
     }
-    const seq = (call.anim && call.anim.sequence) || [];
-    let delay = 120;
-    seq.forEach(stage=>{
-      const dur = stage.fake ? 1100 : 1500;
-      setTimeout(()=> playStageOnDiagram(diagram, stage, caption), delay);
-      delay += dur;
-    });
-  }
-
-  // autoplay shortly after mount
-  setTimeout(run, opts.autoplayDelay!==undefined ? opts.autoplayDelay : 150);
+  });
 }
 
 /* =========================================================
@@ -462,28 +421,17 @@ NUMBERS.forEach(item=>{
     }
     card.classList.add('flipped');
     numviz.innerHTML = '';
-    const info = document.createElement('div');
-    info.className = 'calldetail show';
-    info.style.marginBottom = '0';
-    info.innerHTML = item.text;
-    numviz.appendChild(info);
-
-    const vizHost = document.createElement('div');
-    numviz.appendChild(vizHost);
-
     if(item.n === '0'){
-      const fakeCall = {code:'0', anim:{special:'quick'}};
-      renderCallVisual(vizHost, 'mini', fakeCall, {small:true});
+      renderCallSteps(numviz, 'mini', {code:'0', steps:[item.text], anim:{special:'quick'}}, {small:true});
     } else {
-      const fakeCall = {code:item.n, anim:{sequence:[{mover:'J', digit:item.n}]}};
-      renderCallVisual(vizHost, 'mini', fakeCall, {small:true});
+      renderCallSteps(numviz, 'mini', {code:item.n, steps:[item.text], anim:{sequence:[{mover:'J', digit:item.n}]}}, {small:true});
     }
   });
   numgrid.appendChild(card);
 });
 
 /* =========================================================
-   CALL CARDS — chips per formation, each opens its diagram
+   CALL CARDS — chips per formation, each opens its step-by-step detail
    ========================================================= */
 function renderGroup(groupKey){
   const container = document.querySelector(`.callgrid[data-group="${groupKey}"]`);
@@ -503,13 +451,16 @@ function renderGroup(groupKey){
       }
       chip.classList.add('active');
       detailBox.classList.add('show');
-      detailBox.innerHTML = `<div class="who">${call.who}</div>`;
-      const vizHost = document.createElement('div');
-      detailBox.appendChild(vizHost);
-      renderCallVisual(vizHost, data.layout, call);
-      const ol = document.createElement('ol');
-      ol.innerHTML = call.steps.map(s=>`<li>${s}</li>`).join('');
-      detailBox.appendChild(ol);
+      detailBox.innerHTML = '';
+
+      const titleRow = document.createElement('div');
+      titleRow.className = 'call-title-row';
+      titleRow.innerHTML = `<span class="call-typepill ${call.type==='hoofd'?'pill-hoofd':'pill-variant'}">${call.type==='hoofd'?'HOOFDCALL':'FAKE / VARIANT'}</span><span class="call-who">${call.who}</span>`;
+      detailBox.appendChild(titleRow);
+
+      const stepsHost = document.createElement('div');
+      detailBox.appendChild(stepsHost);
+      renderCallSteps(stepsHost, data.layout, call);
     });
     container.appendChild(chip);
   });
@@ -522,7 +473,7 @@ Object.keys(CALLS).forEach(renderGroup);
 let pool = [];
 Object.keys(CALLS).forEach(key=>{
   CALLS[key].calls.forEach(call=>{
-    pool.push({code:call.code, who:call.who, steps:call.steps, label:CALLS[key].label, layout:CALLS[key].layout, call});
+    pool.push({code:call.code, who:call.who, label:CALLS[key].label, layout:CALLS[key].layout, call});
   });
 });
 
@@ -557,18 +508,6 @@ function nextCard(){
   fcSub.textContent = current.label;
   fcAnswer.classList.remove('show');
   fcAnswer.innerHTML = '';
-  const who = document.createElement('div');
-  who.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);margin-bottom:6px;text-transform:uppercase;";
-  who.textContent = current.who;
-  fcAnswer.appendChild(who);
-  const vizHost = document.createElement('div');
-  fcAnswer.appendChild(vizHost);
-  const ol = document.createElement('ol');
-  ol.innerHTML = current.steps.map(s=>`<li>${s}</li>`).join('');
-  fcAnswer.appendChild(ol);
-  // build the diagram now but only autoplay once revealed
-  renderCallVisual(vizHost, current.layout, current.call, {small:true, autoplayDelay:99999999});
-  current._vizHost = vizHost;
   fcHint.style.display = 'block';
   fcButtons.style.display = 'none';
 }
@@ -577,10 +516,13 @@ flashcard.addEventListener('click', ()=>{
     fcAnswer.classList.add('show');
     fcHint.style.display = 'none';
     fcButtons.style.display = 'flex';
-    // re-render to trigger the autoplay now that it's visible
-    if(current && current._vizHost){
-      renderCallVisual(current._vizHost, current.layout, current.call, {small:true});
-    }
+    const who = document.createElement('div');
+    who.className = 'answer-who';
+    who.textContent = current.who;
+    fcAnswer.appendChild(who);
+    const stepsHost = document.createElement('div');
+    fcAnswer.appendChild(stepsHost);
+    renderCallSteps(stepsHost, current.layout, current.call, {small:true});
   }
 });
 document.getElementById('btn-goed').addEventListener('click', (e)=>{
